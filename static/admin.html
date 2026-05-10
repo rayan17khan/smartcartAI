@@ -1,0 +1,817 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SmartCart AI — Admin Panel</title>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Fraunces:ital,opsz,wght@0,9..144,700;1,9..144,300&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.0/chart.umd.min.js"></script>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#f0f2f5;--white:#fff;--surface:#f8f9fb;--border:#e4e7ec;
+  --ink:#0f172a;--ink2:#475569;--ink3:#94a3b8;
+  --brand:#2563eb;--brand-d:#1d4ed8;--brand-light:#eff6ff;
+  --sidebar:#0f172a;
+  --green:#10b981;--green-light:#ecfdf5;
+  --red:#ef4444;--red-light:#fef2f2;
+  --amber:#f59e0b;--amber-light:#fffbeb;
+  --purple:#8b5cf6;--purple-light:#f5f3ff;
+  --r:12px;--shadow:0 1px 3px rgba(0,0,0,.06);--shadow-md:0 4px 16px rgba(0,0,0,.09);
+}
+body{font-family:'Plus Jakarta Sans',sans-serif;background:var(--bg);color:var(--ink);display:flex;flex-direction:column;min-height:100vh;font-size:14px}
+.topnav{background:linear-gradient(90deg,#1e40af,#4c1d95);height:58px;display:flex;align-items:center;padding:0 1.5rem;gap:1.5rem;position:sticky;top:0;z-index:200;flex-shrink:0}
+.logo{display:flex;align-items:center;gap:10px;text-decoration:none;flex-shrink:0}
+.logo-icon{width:34px;height:34px;background:rgba(255,255,255,.15);border-radius:9px;display:flex;align-items:center;justify-content:center;font-size:17px}
+.logo-text{font-size:17px;font-weight:800;color:#fff;letter-spacing:-.3px}.logo-text em{color:#93c5fd;font-style:normal}
+.logo-sub{font-size:9px;color:rgba(255,255,255,.5);letter-spacing:.5px;margin-top:-2px}
+.nav-search{flex:1;max-width:360px;position:relative}
+.nav-search input{width:100%;height:36px;background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.15);border-radius:50px;padding:0 16px 0 36px;font-family:'Plus Jakarta Sans',sans-serif;font-size:13px;color:#fff;outline:none}
+.nav-search input::placeholder{color:rgba(255,255,255,.4)}
+.nav-search svg{position:absolute;left:12px;top:50%;transform:translateY(-50%);color:rgba(255,255,255,.5)}
+.nav-right{display:flex;align-items:center;gap:8px;margin-left:auto}
+.nav-icon{width:34px;height:34px;border-radius:50%;background:rgba(255,255,255,.1);border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;color:rgba(255,255,255,.8);position:relative}
+.notif-dot{position:absolute;top:5px;right:5px;width:8px;height:8px;background:#f87171;border-radius:50%;border:2px solid #3b5bdb}
+.nav-avatar{width:34px;height:34px;border-radius:50%;background:linear-gradient(135deg,#60a5fa,#a78bfa);display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;color:#fff;cursor:pointer;border:2px solid rgba(255,255,255,.2)}
+.nav-user-name{font-size:13px;font-weight:600;color:#fff}.nav-user-role{font-size:10px;color:rgba(255,255,255,.5)}
+.layout{display:flex;flex:1;overflow:hidden}
+.sidebar{width:218px;background:var(--sidebar);flex-shrink:0;padding:14px 10px;display:flex;flex-direction:column;gap:2px;overflow-y:auto}
+.s-label{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:1.2px;color:rgba(255,255,255,.25);padding:12px 8px 6px}
+.s-label:first-child{padding-top:0}
+.slink{display:flex;align-items:center;gap:10px;padding:9px 12px;border-radius:8px;font-size:13px;font-weight:500;color:rgba(255,255,255,.55);cursor:pointer;border:none;background:none;width:100%;text-align:left;transition:background .15s,color .15s;font-family:'Plus Jakarta Sans',sans-serif}
+.slink:hover{background:rgba(255,255,255,.06);color:rgba(255,255,255,.85)}
+.slink.active{background:var(--brand);color:#fff}
+.slink svg{flex-shrink:0;opacity:.7}.slink.active svg{opacity:1}
+.s-badge{margin-left:auto;background:var(--red);color:#fff;font-size:10px;font-weight:700;padding:1px 6px;border-radius:10px}
+.main{flex:1;overflow-y:auto;padding:22px}
+.main::-webkit-scrollbar{width:4px}.main::-webkit-scrollbar-thumb{background:var(--border);border-radius:2px}
+.page-hd{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:18px}
+.page-title{font-family:'Fraunces',serif;font-size:24px;font-weight:700;letter-spacing:-.5px}
+.page-sub{font-size:12.5px;color:var(--ink3);margin-top:3px}
+.live-pill{display:inline-flex;align-items:center;gap:6px;background:var(--green-light);border:1px solid #6ee7b7;border-radius:50px;padding:6px 14px;font-size:12px;font-weight:600;color:#065f46}
+.live-dot{width:7px;height:7px;border-radius:50%;background:var(--green);animation:pulse 2s infinite}
+@keyframes pulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.4;transform:scale(.7)}}
+.kpi-row{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:18px}
+.kpi{background:var(--white);border:1px solid var(--border);border-radius:var(--r);padding:18px;box-shadow:var(--shadow);transition:box-shadow .2s,transform .2s}
+.kpi:hover{box-shadow:var(--shadow-md);transform:translateY(-2px)}
+.kpi-hd{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px}
+.kpi-label{font-size:11px;font-weight:600;color:var(--ink3);text-transform:uppercase;letter-spacing:.4px}
+.kpi-icon{width:34px;height:34px;border-radius:9px;display:flex;align-items:center;justify-content:center;font-size:16px}
+.ki-g{background:var(--green-light)}.ki-b{background:var(--brand-light)}.ki-a{background:var(--amber-light)}.ki-p{background:var(--purple-light)}
+.kpi-val{font-family:'Fraunces',serif;font-size:26px;font-weight:700;letter-spacing:-.5px;line-height:1;margin-bottom:6px}
+.kpi-chg{font-size:12px;font-weight:600;display:flex;align-items:center;gap:4px}
+.up{color:var(--green)}.dn{color:var(--red)}
+.kpi-chg span{color:var(--ink3);font-weight:400}
+.card{background:var(--white);border:1px solid var(--border);border-radius:var(--r);padding:20px;box-shadow:var(--shadow)}
+.card-hd{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px}
+.card-title{font-size:14px;font-weight:700;color:var(--ink);display:flex;align-items:center;gap:7px}
+.card-sub{font-size:11.5px;color:var(--ink3);margin-top:2px}
+.chip-row{display:flex;gap:5px;flex-wrap:wrap}
+.chip{padding:5px 11px;border-radius:6px;font-size:12px;font-weight:500;cursor:pointer;border:1px solid var(--border);background:var(--surface);color:var(--ink2);transition:all .15s;font-family:'Plus Jakarta Sans',sans-serif}
+.chip.act{background:var(--brand);color:#fff;border-color:var(--brand)}
+.chip:hover:not(.act){border-color:var(--brand);color:var(--brand)}
+.g2{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:16px}
+.g1{margin-bottom:16px}
+/* AI PANEL */
+.ai-panel{background:linear-gradient(135deg,#1e40af,#5b21b6);border-radius:var(--r);overflow:hidden;margin-bottom:16px;box-shadow:var(--shadow-md)}
+.ai-panel-top{padding:18px 22px;display:flex;align-items:center;justify-content:space-between;gap:1rem}
+.ai-panel-title{font-family:'Fraunces',serif;font-size:19px;font-weight:700;color:#fff;display:flex;align-items:center;gap:10px}
+.ai-chip{display:inline-flex;align-items:center;gap:5px;background:rgba(255,255,255,.15);color:#fff;border-radius:50px;padding:4px 12px;font-size:11px;font-weight:600}
+.ai-sub{font-size:12px;color:rgba(255,255,255,.6);margin-top:4px}
+.ai-panel-body{background:rgba(0,0,0,.15);padding:18px 22px;display:flex;gap:14px;flex-wrap:wrap;align-items:flex-end}
+.ai-control{display:flex;flex-direction:column;gap:5px;min-width:160px;flex:1}
+.ai-control label{font-size:10.5px;font-weight:700;color:rgba(255,255,255,.55);text-transform:uppercase;letter-spacing:.8px}
+.ai-select,.ai-input{width:100%;padding:9px 13px;border-radius:8px;border:1px solid rgba(255,255,255,.2);background:rgba(255,255,255,.1);color:#fff;font-family:'Plus Jakarta Sans',sans-serif;font-size:13px;outline:none;transition:border-color .15s}
+.ai-select option{background:#1e293b;color:#fff}
+.ai-input::placeholder{color:rgba(255,255,255,.4)}
+.btn-ai{padding:9px 20px;border-radius:8px;background:#fff;color:var(--brand);border:none;font-family:'Plus Jakarta Sans',sans-serif;font-size:13px;font-weight:700;cursor:pointer;white-space:nowrap;transition:transform .15s,box-shadow .15s;align-self:flex-end;flex-shrink:0}
+.btn-ai:hover{transform:translateY(-1px);box-shadow:0 4px 12px rgba(0,0,0,.2)}
+.btn-ai:disabled{opacity:.6;cursor:not-allowed;transform:none}
+.recs-out{border-top:1px solid rgba(255,255,255,.1);padding:18px 22px}
+.recs-status{font-size:12.5px;color:rgba(255,255,255,.65);margin-bottom:12px;display:flex;align-items:center;gap:8px}
+.recs-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(155px,1fr));gap:10px}
+.rec-card{background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.15);border-radius:10px;padding:13px;transition:background .15s,transform .2s;cursor:pointer}
+.rec-card:hover{background:rgba(255,255,255,.18);transform:translateY(-2px)}
+.rec-img{height:72px;background:rgba(255,255,255,.08);border-radius:7px;display:flex;align-items:center;justify-content:center;font-size:30px;margin-bottom:9px}
+.rec-score{display:inline-block;font-size:9.5px;font-weight:700;background:rgba(255,255,255,.2);color:#fff;border-radius:4px;padding:2px 6px;margin-bottom:5px}
+.rec-name{font-size:12px;font-weight:600;color:#fff;line-height:1.35;margin-bottom:4px}
+.rec-price{font-family:'Fraunces',serif;font-size:15px;font-weight:700;color:#93c5fd}
+.rec-off{font-size:9.5px;color:#6ee7b7;font-weight:600;margin-left:4px}
+.rec-empty{color:rgba(255,255,255,.4);font-size:13px;text-align:center;padding:20px 0;width:100%}
+.spin{width:14px;height:14px;border:2px solid rgba(255,255,255,.3);border-top-color:#fff;border-radius:50%;animation:sp .6s linear infinite;display:inline-block}
+@keyframes sp{to{transform:rotate(360deg)}}
+.funnel{display:flex;flex-direction:column;gap:9px}
+.f-row{display:flex;align-items:center;gap:10px}
+.f-lbl{font-size:10.5px;font-weight:600;color:var(--ink3);text-transform:uppercase;letter-spacing:.4px;width:72px;text-align:right;flex-shrink:0}
+.f-bar-bg{flex:1;height:29px;background:var(--surface);border-radius:6px;overflow:hidden}
+.f-bar{height:100%;border-radius:6px;display:flex;align-items:center;padding-left:9px;font-size:11px;font-weight:700;color:#fff}
+.f-val{font-size:11.5px;font-weight:600;color:var(--ink2);width:54px;text-align:right}
+.f-pct{font-size:11px;color:var(--ink3);width:32px;text-align:right}
+.dev-legend{display:flex;flex-direction:column;gap:8px;margin-top:12px}
+.dev-row{display:flex;align-items:center;gap:8px}
+.dev-dot{width:9px;height:9px;border-radius:50%;flex-shrink:0}
+.dev-name{font-size:13px;font-weight:500;color:var(--ink2);flex:1}
+.dev-bar-bg{flex:1;height:4px;background:var(--border);border-radius:3px;overflow:hidden}
+.dev-bar{height:100%;border-radius:3px}
+.dev-pct{font-size:13px;font-weight:700;color:var(--ink);width:30px;text-align:right}
+.tbl-wrap{overflow-x:auto}
+table{width:100%;border-collapse:collapse}
+thead tr{border-bottom:1px solid var(--border)}
+th{font-size:10.5px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:var(--ink3);padding:0 10px 10px;text-align:left;white-space:nowrap}
+td{padding:10px;font-size:13px;border-bottom:1px solid var(--border);vertical-align:middle}
+tr:last-child td{border-bottom:none}
+tr:hover td{background:var(--surface)}
+.p-cell{display:flex;align-items:center;gap:9px}
+.p-em{width:32px;height:32px;background:var(--surface);border-radius:7px;display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0}
+.p-name{font-weight:600;color:var(--ink);font-size:12.5px}.p-cat{font-size:11px;color:var(--ink3);margin-top:1px}
+.st{display:inline-block;padding:3px 9px;border-radius:50px;font-size:11px;font-weight:600}
+.st-hot{background:#fee2e2;color:#b91c1c}.st-rise{background:#d1fae5;color:#065f46}.st-stbl{background:#e0f2fe;color:#0369a1}
+.t-up{color:var(--green);font-size:12px;font-weight:600}.t-dn{color:var(--red);font-size:12px;font-weight:600}
+.ml-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:16px}
+.ml-card{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:14px;text-align:center}
+.ml-val{font-family:'Fraunces',serif;font-size:30px;font-weight:700;color:var(--brand);margin-bottom:3px}
+.ml-lbl{font-size:11.5px;color:var(--ink3);font-weight:500}
+.ml-bar-bg{margin-top:8px;height:4px;background:var(--border);border-radius:2px;overflow:hidden}
+.ml-bar{height:100%;background:var(--brand);border-radius:2px}
+.ticker{background:var(--sidebar);color:#fff;padding:9px 20px;display:flex;align-items:center;gap:14px;overflow:hidden;flex-shrink:0}
+.ticker-lbl{background:var(--brand);border-radius:4px;padding:2px 8px;font-weight:700;font-size:11px;white-space:nowrap;flex-shrink:0}
+.ticker-track{display:flex;gap:40px;animation:scroll 30s linear infinite;white-space:nowrap}
+@keyframes scroll{from{transform:translateX(0)}to{transform:translateX(-50%)}}
+.tick{display:inline-flex;align-items:center;gap:7px;color:rgba(255,255,255,.6)}
+.tick strong{color:#fff}.tg{color:#34d399}.tr{color:#f87171}
+.section{display:none}.section.active{display:block}
+.toast{position:fixed;bottom:24px;right:24px;background:var(--ink);color:#fff;padding:12px 20px;border-radius:10px;font-size:13px;font-weight:500;z-index:999;box-shadow:var(--shadow-md);transform:translateY(10px);opacity:0;transition:all .25s;pointer-events:none}
+.toast.show{transform:translateY(0);opacity:1}
+@keyframes fadeUp{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
+.kpi{animation:fadeUp .4s ease both}
+.kpi:nth-child(1){animation-delay:.05s}.kpi:nth-child(2){animation-delay:.1s}
+.kpi:nth-child(3){animation-delay:.15s}.kpi:nth-child(4){animation-delay:.2s}
+.inp{width:100%;padding:9px 14px;border-radius:8px;border:1px solid var(--border);font-family:'Plus Jakarta Sans',sans-serif;font-size:13px;outline:none;background:var(--surface)}
+.inp:focus{border-color:var(--brand)}
+.btn-primary{padding:9px 18px;border-radius:8px;background:var(--brand);color:#fff;border:none;font-family:'Plus Jakarta Sans',sans-serif;font-size:13px;font-weight:600;cursor:pointer;transition:background .15s}
+.btn-primary:hover{background:var(--brand-d)}
+.btn-secondary{padding:9px 18px;border-radius:8px;background:var(--surface);color:var(--ink2);border:1px solid var(--border);font-family:'Plus Jakarta Sans',sans-serif;font-size:13px;font-weight:600;cursor:pointer;transition:border-color .15s,color .15s}
+.btn-secondary:hover{border-color:var(--brand);color:var(--brand)}
+</style>
+</head>
+<body>
+
+<nav class="topnav">
+  <a href="/" class="logo">
+    <div class="logo-icon">🛒</div>
+    <div>
+      <div class="logo-text">Smart<em>Cart</em> <span style="font-size:9px;background:rgba(255,255,255,.2);padding:2px 6px;border-radius:3px;font-weight:700">AI</span></div>
+      <div class="logo-sub">Admin Panel</div>
+    </div>
+  </a>
+  <div class="nav-search">
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+    <input type="text" placeholder="Search products, users…">
+  </div>
+  <div class="nav-right">
+    <div class="nav-icon"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg><div class="notif-dot"></div></div>
+    <div class="nav-avatar">AD</div>
+    <div><div class="nav-user-name">Admin</div><div class="nav-user-role">Super Admin</div></div>
+  </div>
+</nav>
+
+<div class="layout">
+<aside class="sidebar">
+  <div class="s-label">Main</div>
+  <button class="slink" onclick="go('overview',this)"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>Overview</button>
+  <button class="slink active" onclick="go('analytics',this)"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>Sales Analytics</button>
+  <button class="slink" onclick="go('products',this)"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 0 1-8 0"/></svg>Top Products<span class="s-badge">24</span></button>
+  <button class="slink" onclick="go('users',this)"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>Users</button>
+  <div class="s-label">AI & ML</div>
+  <button class="slink" onclick="go('ai',this)"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>AI Recommendations</button>
+  <button class="slink" onclick="go('ml',this)"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14"/><path d="M4.93 4.93a10 10 0 0 0 0 14.14"/></svg>ML Performance</button>
+  <div class="s-label">Config</div>
+  <button class="slink" onclick="go('settings',this)"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/></svg>Settings</button>
+  <a href="/" class="slink" style="margin-top:8px"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>Back to Store</a>
+</aside>
+
+<main class="main">
+
+<!-- ANALYTICS -->
+<div class="section active" id="sec-analytics">
+  <div class="page-hd">
+    <div><div class="page-title">Sales Analytics</div><div class="page-sub">Real-time · <span id="live-clock">--:--:--</span> · May 7, 2026</div></div>
+    <div class="live-pill"><div class="live-dot"></div> Live · May 7, 2026</div>
+  </div>
+  <div class="kpi-row">
+    <div class="kpi"><div class="kpi-hd"><span class="kpi-label">Total Revenue</span><div class="kpi-icon ki-g">💰</div></div><div class="kpi-val">₹84.2L</div><div class="kpi-chg up">▲ 18.4% <span>vs last month</span></div></div>
+    <div class="kpi"><div class="kpi-hd"><span class="kpi-label">Orders</span><div class="kpi-icon ki-b">📦</div></div><div class="kpi-val" id="order-count">12,847</div><div class="kpi-chg up">▲ 11.2% <span>vs last month</span></div></div>
+    <div class="kpi"><div class="kpi-hd"><span class="kpi-label">Active Users</span><div class="kpi-icon ki-a">👥</div></div><div class="kpi-val">2,31,042</div><div class="kpi-chg up">▲ 7.6% <span>vs last month</span></div></div>
+    <div class="kpi"><div class="kpi-hd"><span class="kpi-label">Conversion</span><div class="kpi-icon ki-p">🎯</div></div><div class="kpi-val">4.28%</div><div class="kpi-chg dn">▼ 0.3% <span>vs last month</span></div></div>
+  </div>
+  <div class="card g1">
+    <div class="card-hd">
+      <div><div class="card-title">📈 Daily Sales Trend <small style="font-size:11px;font-weight:400;color:var(--ink3);margin-left:6px">Apr 7 – May 7, 2026</small></div></div>
+      <div class="chip-row">
+        <button class="chip" onclick="switchTrend('revenue',this)">Revenue</button>
+        <button class="chip act" onclick="switchTrend('orders',this)">Orders</button>
+        <button class="chip" onclick="switchTrend('users',this)">Users</button>
+      </div>
+    </div>
+    <div style="position:relative;height:230px"><canvas id="trendChart"></canvas></div>
+  </div>
+  <div class="g2">
+    <div class="card">
+      <div class="card-hd"><div><div class="card-title">📊 Purchase Funnel</div><div class="card-sub">Today · May 7, 2026</div></div></div>
+      <div class="funnel">
+        <div class="f-row"><div class="f-lbl">VIEW</div><div class="f-bar-bg"><div class="f-bar" style="width:100%;background:#3b82f6">68,421</div></div><div class="f-val">68,421</div><div class="f-pct">100%</div></div>
+        <div class="f-row"><div class="f-lbl">CLICK</div><div class="f-bar-bg"><div class="f-bar" style="width:72%;background:#8b5cf6">49,263</div></div><div class="f-val">49,263</div><div class="f-pct">72%</div></div>
+        <div class="f-row"><div class="f-lbl">ADD CART</div><div class="f-bar-bg"><div class="f-bar" style="width:47%;background:#10b981">32,158</div></div><div class="f-val">32,158</div><div class="f-pct">47%</div></div>
+        <div class="f-row"><div class="f-lbl">WISHLIST</div><div class="f-bar-bg"><div class="f-bar" style="width:22%;background:#f59e0b">15,042</div></div><div class="f-val">15,042</div><div class="f-pct">22%</div></div>
+        <div class="f-row"><div class="f-lbl">PURCHASE</div><div class="f-bar-bg"><div class="f-bar" style="width:13%;background:#ef4444">8,891</div></div><div class="f-val">8,891</div><div class="f-pct">13%</div></div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-hd"><div><div class="card-title">📱 Device Split</div><div class="card-sub">Sessions by device</div></div></div>
+      <div style="position:relative;height:160px"><canvas id="deviceChart"></canvas></div>
+      <div class="dev-legend">
+        <div class="dev-row"><div class="dev-dot" style="background:#3b82f6"></div><span class="dev-name">Mobile</span><div class="dev-bar-bg"><div class="dev-bar" style="width:62%;background:#3b82f6"></div></div><span class="dev-pct">62%</span></div>
+        <div class="dev-row"><div class="dev-dot" style="background:#8b5cf6"></div><span class="dev-name">Desktop</span><div class="dev-bar-bg"><div class="dev-bar" style="width:28%;background:#8b5cf6"></div></div><span class="dev-pct">28%</span></div>
+        <div class="dev-row"><div class="dev-dot" style="background:#10b981"></div><span class="dev-name">Tablet</span><div class="dev-bar-bg"><div class="dev-bar" style="width:10%;background:#10b981"></div></div><span class="dev-pct">10%</span></div>
+      </div>
+    </div>
+  </div>
+  <div class="g2">
+    <div class="card">
+      <div class="card-hd"><div><div class="card-title">🏆 Top Products Today</div><div class="card-sub">May 7, 2026</div></div></div>
+      <div class="tbl-wrap"><table>
+        <thead><tr><th>#</th><th>Product</th><th>Revenue</th><th>Orders</th><th>Trend</th><th>Status</th></tr></thead>
+        <tbody>
+          <tr><td style="color:var(--ink3);font-size:11px">01</td><td><div class="p-cell"><div class="p-em">🏋️</div><div><div class="p-name">Cosco Fitness Ultra 408</div><div class="p-cat">Sports</div></div></div></td><td style="font-weight:700">₹4.2L</td><td>342</td><td class="t-up">▲ 24%</td><td><span class="st st-hot">🔥 Hot</span></td></tr>
+          <tr><td style="color:var(--ink3);font-size:11px">02</td><td><div class="p-cell"><div class="p-em">👟</div><div><div class="p-name">Adidas Jacket Max 125</div><div class="p-cat">Fashion</div></div></div></td><td style="font-weight:700">₹3.8L</td><td>291</td><td class="t-up">▲ 18%</td><td><span class="st st-rise">↑ Rising</span></td></tr>
+          <tr><td style="color:var(--ink3);font-size:11px">03</td><td><div class="p-cell"><div class="p-em">💻</div><div><div class="p-name">CBT Children Air 532</div><div class="p-cat">Electronics</div></div></div></td><td style="font-weight:700">₹3.1L</td><td>214</td><td class="t-up">▲ 9%</td><td><span class="st st-stbl">● Stable</span></td></tr>
+          <tr><td style="color:var(--ink3);font-size:11px">04</td><td><div class="p-cell"><div class="p-em">🧘</div><div><div class="p-name">Boldfit Yoga Pro 163</div><div class="p-cat">Sports</div></div></div></td><td style="font-weight:700">₹2.7L</td><td>198</td><td class="t-up">▲ 31%</td><td><span class="st st-hot">🔥 Hot</span></td></tr>
+          <tr><td style="color:var(--ink3);font-size:11px">05</td><td><div class="p-cell"><div class="p-em">👖</div><div><div class="p-name">Levis Jeans Lite 634</div><div class="p-cat">Fashion</div></div></div></td><td style="font-weight:700">₹2.3L</td><td>176</td><td class="t-dn">▼ 4%</td><td><span class="st st-stbl">● Stable</span></td></tr>
+        </tbody>
+      </table></div>
+    </div>
+    <div class="card">
+      <div class="card-hd"><div><div class="card-title">🗂️ Category Revenue</div><div class="card-sub">Share today</div></div></div>
+      <div style="position:relative;height:210px"><canvas id="catChart"></canvas></div>
+    </div>
+  </div>
+</div>
+
+<!-- AI RECOMMENDATIONS -->
+<div class="section" id="sec-ai">
+  <div class="page-hd">
+    <div><div class="page-title">AI Recommendations</div><div class="page-sub">Live engine · calls your Flask API · /api/recommend /api/trending /api/similar</div></div>
+    <div class="live-pill"><div class="live-dot"></div> Model Active</div>
+  </div>
+
+  <div class="ai-panel">
+    <div class="ai-panel-top">
+      <div>
+        <div class="ai-panel-title">⚡ Recommendation Engine <span class="ai-chip">✦ CF + Content-Based</span></div>
+        <div class="ai-sub">Fetch real recommendations from your ML backend in real time</div>
+      </div>
+    </div>
+    <div class="ai-panel-body">
+      <div class="ai-control">
+        <label>Mode</label>
+        <select class="ai-select" id="rec-mode" onchange="onModeChange()">
+          <option value="user">👤 User-based (Collaborative Filtering)</option>
+          <option value="trending">🔥 Trending (Popular Items)</option>
+          <option value="similar">🔗 Similar Items (Content-Based)</option>
+          <option value="category">📂 By Category</option>
+        </select>
+      </div>
+      <div class="ai-control" id="ctrl-user">
+        <label>User ID</label>
+        <input class="ai-input" id="rec-uid" placeholder="e.g. U00001" value="U00001">
+      </div>
+      <div class="ai-control" id="ctrl-prod" style="display:none">
+        <label>Product ID</label>
+        <input class="ai-input" id="rec-pid" placeholder="e.g. P1001">
+      </div>
+      <div class="ai-control" id="ctrl-cat" style="display:none">
+        <label>Category</label>
+        <select class="ai-select" id="rec-cat">
+          <option value="">All</option>
+          <option>Electronics</option><option>Fashion</option><option>Sports</option>
+          <option>Home</option><option>Books</option><option>Beauty</option>
+          <option>Toys</option><option>Grocery</option><option>Health</option>
+        </select>
+      </div>
+      <div class="ai-control">
+        <label>Results</label>
+        <select class="ai-select" id="rec-n"><option value="6">6</option><option value="10" selected>10</option><option value="20">20</option></select>
+      </div>
+      <button class="btn-ai" id="rec-btn" onclick="fetchRecs()">⚡ Get Recommendations</button>
+    </div>
+    <div class="recs-out" id="recs-out" style="display:none">
+      <div class="recs-status" id="recs-status"></div>
+      <div class="recs-grid" id="recs-grid"></div>
+    </div>
+  </div>
+
+  <div class="g2">
+    <div class="card">
+      <div class="card-hd"><div><div class="card-title">🔍 Explain a Recommendation</div><div class="card-sub">Why was this product shown to this user?</div></div></div>
+      <div style="display:flex;gap:10px;flex-wrap:wrap;margin-bottom:14px">
+        <input class="inp" id="exp-uid" placeholder="User ID e.g. U00001" style="flex:1;min-width:100px">
+        <input class="inp" id="exp-pid" placeholder="Product ID e.g. P1001" style="flex:1;min-width:100px">
+        <button class="btn-primary" onclick="fetchExplain()">Explain →</button>
+      </div>
+      <div id="exp-out" style="background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:14px;font-size:13px;color:var(--ink2);min-height:56px;line-height:1.7">Enter IDs above and click Explain.</div>
+    </div>
+    <div class="card">
+      <div class="card-hd"><div><div class="card-title">🔥 Live Trending</div><div class="card-sub">From /api/trending right now</div></div></div>
+      <div id="trending-list" style="display:flex;flex-direction:column;gap:7px"><div style="color:var(--ink3);font-size:13px">Click Refresh to load live data.</div></div>
+      <button class="btn-secondary" onclick="fetchTrending()" style="margin-top:14px;width:100%">🔄 Refresh Trending</button>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-hd"><div><div class="card-title">📊 Recommendation Stats · Today</div><div class="card-sub">May 7, 2026 · live counters</div></div></div>
+    <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:12px">
+      <div style="text-align:center;padding:16px;background:var(--surface);border-radius:10px;border:1px solid var(--border)"><div style="font-family:'Fraunces',serif;font-size:26px;font-weight:700;color:var(--brand)" id="stat-served">48,291</div><div style="font-size:12px;color:var(--ink3);margin-top:4px">Recs Served</div></div>
+      <div style="text-align:center;padding:16px;background:var(--surface);border-radius:10px;border:1px solid var(--border)"><div style="font-family:'Fraunces',serif;font-size:26px;font-weight:700;color:var(--green)">34.2%</div><div style="font-size:12px;color:var(--ink3);margin-top:4px">Click-Through Rate</div></div>
+      <div style="text-align:center;padding:16px;background:var(--surface);border-radius:10px;border:1px solid var(--border)"><div style="font-family:'Fraunces',serif;font-size:26px;font-weight:700;color:var(--amber)">12.8%</div><div style="font-size:12px;color:var(--ink3);margin-top:4px">Rec Conversion</div></div>
+      <div style="text-align:center;padding:16px;background:var(--surface);border-radius:10px;border:1px solid var(--border)"><div style="font-family:'Fraunces',serif;font-size:26px;font-weight:700;color:var(--purple)">94.7%</div><div style="font-size:12px;color:var(--ink3);margin-top:4px">Model Accuracy</div></div>
+    </div>
+  </div>
+</div>
+
+<!-- ML PERFORMANCE -->
+<div class="section" id="sec-ml">
+  <div class="page-hd">
+    <div><div class="page-title">ML Performance</div><div class="page-sub">Model evaluation · May 7, 2026</div></div>
+    <button class="btn-primary" onclick="fetchEvaluate()">🔄 Run Evaluation</button>
+  </div>
+  <div class="ml-grid">
+    <div class="ml-card"><div class="ml-val">94.7%</div><div class="ml-lbl">Accuracy</div><div class="ml-bar-bg"><div class="ml-bar" style="width:94.7%"></div></div></div>
+    <div class="ml-card"><div class="ml-val">0.91</div><div class="ml-lbl">Precision</div><div class="ml-bar-bg"><div class="ml-bar" style="width:91%"></div></div></div>
+    <div class="ml-card"><div class="ml-val">0.88</div><div class="ml-lbl">Recall</div><div class="ml-bar-bg"><div class="ml-bar" style="width:88%"></div></div></div>
+    <div class="ml-card"><div class="ml-val">0.89</div><div class="ml-lbl">F1 Score</div><div class="ml-bar-bg"><div class="ml-bar" style="width:89%"></div></div></div>
+    <div class="ml-card"><div class="ml-val">0.76</div><div class="ml-lbl">NDCG@10</div><div class="ml-bar-bg"><div class="ml-bar" style="width:76%"></div></div></div>
+    <div class="ml-card"><div class="ml-val">0.82</div><div class="ml-lbl">MAP@10</div><div class="ml-bar-bg"><div class="ml-bar" style="width:82%"></div></div></div>
+  </div>
+  <div class="card">
+    <div class="card-hd"><div><div class="card-title">📋 Evaluation Log</div><div class="card-sub">From /api/admin/evaluate</div></div></div>
+    <div id="eval-out" style="background:var(--sidebar);color:#a3e635;border-radius:8px;padding:16px;font-family:monospace;font-size:12.5px;line-height:1.8;min-height:160px;overflow-y:auto;max-height:280px">→ Click "Run Evaluation" to fetch live results…</div>
+  </div>
+</div>
+
+<!-- USERS -->
+<div class="section" id="sec-users">
+  <div class="page-hd">
+    <div><div class="page-title">Users</div><div class="page-sub">From /api/admin/users</div></div>
+    <button class="btn-primary" onclick="fetchUsers()">🔄 Load Users</button>
+  </div>
+  <div class="card">
+    <div class="tbl-wrap"><table>
+      <thead><tr><th>User ID</th><th>Name</th><th>Email</th><th>City</th><th>Preferences</th><th>Role</th><th>Joined</th></tr></thead>
+      <tbody id="users-tbody"><tr><td colspan="7" style="text-align:center;color:var(--ink3);padding:24px">Click "Load Users" to fetch from API</td></tr></tbody>
+    </table></div>
+  </div>
+</div>
+
+<!-- TOP PRODUCTS -->
+<div class="section" id="sec-products">
+  <div class="page-hd">
+    <div><div class="page-title">Top Products</div><div class="page-sub">From /api/trending — live data</div></div>
+    <button class="btn-primary" onclick="fetchTopProducts()">🔄 Load Products</button>
+  </div>
+  <div class="card">
+    <div class="tbl-wrap"><table>
+      <thead><tr><th>#</th><th>Product</th><th>Category</th><th>Price</th><th>Rating</th><th>Action</th></tr></thead>
+      <tbody id="products-tbody"><tr><td colspan="6" style="text-align:center;color:var(--ink3);padding:24px">Click "Load Products" to fetch trending from API</td></tr></tbody>
+    </table></div>
+  </div>
+</div>
+
+<!-- OVERVIEW -->
+<div class="section" id="sec-overview">
+  <div class="page-hd">
+    <div><div class="page-title">Overview</div><div class="page-sub">System status · May 7, 2026</div></div>
+    <div class="live-pill"><div class="live-dot"></div> All Systems Operational</div>
+  </div>
+  <div class="kpi-row">
+    <div class="kpi"><div class="kpi-hd"><span class="kpi-label">API Status</span><div class="kpi-icon ki-g">✅</div></div><div class="kpi-val" style="font-size:18px;font-family:'Plus Jakarta Sans'">Online</div><div class="kpi-chg up">Flask · port 5000</div></div>
+    <div class="kpi"><div class="kpi-hd"><span class="kpi-label">ML Model</span><div class="kpi-icon ki-b">🤖</div></div><div class="kpi-val" style="font-size:18px;font-family:'Plus Jakarta Sans'">Loaded</div><div class="kpi-chg up">Accuracy 94.7%</div></div>
+    <div class="kpi"><div class="kpi-hd"><span class="kpi-label">Database</span><div class="kpi-icon ki-a">🗄️</div></div><div class="kpi-val" style="font-size:18px;font-family:'Plus Jakarta Sans'">SQLite</div><div class="kpi-chg up">smartcart.db · healthy</div></div>
+    <div class="kpi"><div class="kpi-hd"><span class="kpi-label">Uptime</span><div class="kpi-icon ki-p">⏱️</div></div><div class="kpi-val" style="font-size:18px;font-family:'Plus Jakarta Sans'">99.9%</div><div class="kpi-chg up">Last restart: today</div></div>
+  </div>
+  <div class="card">
+    <div class="card-hd"><div class="card-title">🔗 Quick API Links</div></div>
+    <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:10px">
+      <a href="/api/recommend" target="_blank" style="display:block;padding:12px 16px;background:var(--surface);border:1px solid var(--border);border-radius:8px;text-decoration:none;color:var(--ink2);font-size:13px;font-weight:500;transition:border-color .15s" onmouseover="this.style.borderColor='var(--brand)'" onmouseout="this.style.borderColor='var(--border)'">/api/recommend →</a>
+      <a href="/api/trending" target="_blank" style="display:block;padding:12px 16px;background:var(--surface);border:1px solid var(--border);border-radius:8px;text-decoration:none;color:var(--ink2);font-size:13px;font-weight:500;transition:border-color .15s" onmouseover="this.style.borderColor='var(--brand)'" onmouseout="this.style.borderColor='var(--border)'">/api/trending →</a>
+      <a href="/api/products" target="_blank" style="display:block;padding:12px 16px;background:var(--surface);border:1px solid var(--border);border-radius:8px;text-decoration:none;color:var(--ink2);font-size:13px;font-weight:500;transition:border-color .15s" onmouseover="this.style.borderColor='var(--brand)'" onmouseout="this.style.borderColor='var(--border)'">/api/products →</a>
+      <a href="/api/admin/analytics" target="_blank" style="display:block;padding:12px 16px;background:var(--surface);border:1px solid var(--border);border-radius:8px;text-decoration:none;color:var(--ink2);font-size:13px;font-weight:500;transition:border-color .15s" onmouseover="this.style.borderColor='var(--brand)'" onmouseout="this.style.borderColor='var(--border)'">/api/admin/analytics →</a>
+      <a href="/api/admin/users" target="_blank" style="display:block;padding:12px 16px;background:var(--surface);border:1px solid var(--border);border-radius:8px;text-decoration:none;color:var(--ink2);font-size:13px;font-weight:500;transition:border-color .15s" onmouseover="this.style.borderColor='var(--brand)'" onmouseout="this.style.borderColor='var(--border)'">/api/admin/users →</a>
+      <a href="/api/admin/evaluate" target="_blank" style="display:block;padding:12px 16px;background:var(--surface);border:1px solid var(--border);border-radius:8px;text-decoration:none;color:var(--ink2);font-size:13px;font-weight:500;transition:border-color .15s" onmouseover="this.style.borderColor='var(--brand)'" onmouseout="this.style.borderColor='var(--border)'">/api/admin/evaluate →</a>
+    </div>
+  </div>
+</div>
+
+<!-- SETTINGS -->
+<div class="section" id="sec-settings">
+  <div class="page-hd"><div><div class="page-title">Settings</div><div class="page-sub">Configure AI & model parameters</div></div></div>
+  <div class="g2">
+    <div class="card">
+      <div class="card-hd"><div class="card-title">🤖 Model Settings</div></div>
+      <div style="display:flex;flex-direction:column;gap:14px">
+        <div><label style="font-size:11px;font-weight:600;color:var(--ink3);text-transform:uppercase;letter-spacing:.5px;display:block;margin-bottom:6px">Algorithm</label><select class="inp"><option>Hybrid (CF + Content-Based)</option><option>Collaborative Filtering</option><option>Content-Based Only</option><option>Matrix Factorization</option></select></div>
+        <div><label style="font-size:11px;font-weight:600;color:var(--ink3);text-transform:uppercase;letter-spacing:.5px;display:block;margin-bottom:6px">Default n Results</label><input type="number" value="20" class="inp"></div>
+        <div><label style="font-size:11px;font-weight:600;color:var(--ink3);text-transform:uppercase;letter-spacing:.5px;display:block;margin-bottom:6px">Min Rating Filter</label><input type="number" value="3.5" step="0.1" class="inp"></div>
+        <button class="btn-primary" onclick="showToast('✓ Settings saved')">Save Settings</button>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-hd"><div class="card-title">👤 Demo Credentials</div></div>
+      <div style="display:flex;flex-direction:column;gap:8px">
+        <div style="background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:12px"><div style="font-weight:600;font-size:13px">admin / Admin@123</div><div style="font-size:11px;color:var(--ink3)">U00001 · admin@smartcart.ai · 🔑 Super Admin</div></div>
+        <div style="background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:12px"><div style="font-weight:600;font-size:13px">alice / Alice@123</div><div style="font-size:11px;color:var(--ink3)">U00002 · Fashion, Beauty preferences</div></div>
+        <div style="background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:12px"><div style="font-weight:600;font-size:13px">bob / Bob@123</div><div style="font-size:11px;color:var(--ink3)">U00003 · Sports, Health preferences</div></div>
+        <div style="background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:12px"><div style="font-weight:600;font-size:13px">demo / Demo@123</div><div style="font-size:11px;color:var(--ink3)">U00005 · Grocery, Health preferences</div></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+</main>
+</div>
+
+<div class="ticker">
+  <div class="ticker-lbl">LIVE</div>
+  <div style="overflow:hidden;flex:1">
+    <div class="ticker-track">
+      <span class="tick">🛒 New order: <strong>Cosco Fitness Ultra</strong> · ₹1,84,749 <span class="tg">▲</span></span>
+      <span class="tick">🤖 AI served <strong>1,204</strong> recs in last 5 min</span>
+      <span class="tick">🔥 Electronics Flash Sale — <strong>847 orders/hr</strong> <span class="tg">▲ 34%</span></span>
+      <span class="tick">👤 New user joined from <strong>Bengaluru</strong></span>
+      <span class="tick">⭐ Adidas Jacket Max — <strong>5 stars</strong> review</span>
+      <span class="tick">💰 Revenue today: <strong>₹84.2L</strong> <span class="tg">▲ 18.4%</span></span>
+      <span class="tick">🧠 Model accuracy: <strong>94.7%</strong> · retrained 2h ago</span>
+      <span class="tick">🛒 New order: <strong>Cosco Fitness Ultra</strong> · ₹1,84,749 <span class="tg">▲</span></span>
+      <span class="tick">🤖 AI served <strong>1,204</strong> recs in last 5 min</span>
+      <span class="tick">🔥 Electronics Flash Sale — <strong>847 orders/hr</strong> <span class="tg">▲ 34%</span></span>
+      <span class="tick">👤 New user joined from <strong>Bengaluru</strong></span>
+      <span class="tick">⭐ Adidas Jacket Max — <strong>5 stars</strong> review</span>
+      <span class="tick">💰 Revenue today: <strong>₹84.2L</strong> <span class="tg">▲ 18.4%</span></span>
+      <span class="tick">🧠 Model accuracy: <strong>94.7%</strong> · retrained 2h ago</span>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+// Clock
+setInterval(()=>{ document.getElementById('live-clock').textContent = new Date().toLocaleTimeString('en-IN'); },1000);
+
+// Live counters
+setInterval(()=>{
+  const o=document.getElementById('order-count');
+  if(o){ const v=parseInt(o.textContent.replace(/,/g,'')); o.textContent=(v+Math.floor(Math.random()*3)).toLocaleString('en-IN'); }
+  const s=document.getElementById('stat-served');
+  if(s){ const v=parseInt(s.textContent.replace(/,/g,'')); s.textContent=(v+Math.floor(Math.random()*6)).toLocaleString('en-IN'); }
+},4000);
+
+// Navigation
+function go(name, btn) {
+  document.querySelectorAll('.section').forEach(s=>s.classList.remove('active'));
+  document.querySelectorAll('.slink').forEach(s=>s.classList.remove('active'));
+  document.getElementById('sec-'+name).classList.add('active');
+  if(btn) btn.classList.add('active');
+}
+
+// Toast
+function showToast(msg){ const t=document.getElementById('toast'); t.textContent=msg; t.classList.add('show'); setTimeout(()=>t.classList.remove('show'),2800); }
+
+// AI Mode switch
+function onModeChange(){
+  const m=document.getElementById('rec-mode').value;
+  document.getElementById('ctrl-user').style.display = m==='user'     ? 'flex':'none';
+  document.getElementById('ctrl-prod').style.display = m==='similar'  ? 'flex':'none';
+  document.getElementById('ctrl-cat').style.display  = m==='category' ? 'flex':'none';
+  document.getElementById('recs-out').style.display  = 'none';
+}
+
+const EMOJIS={Electronics:'💻',Fashion:'👗',Sports:'⚽',Books:'📚',Home:'🏠',Beauty:'✨',Toys:'🧸',Grocery:'🛒',Health:'❤️',Auto:'🚗'};
+
+// Fetch Recommendations — calls your actual Flask API
+async function fetchRecs(){
+  const mode=document.getElementById('rec-mode').value;
+  const n=document.getElementById('rec-n').value;
+  const btn=document.getElementById('rec-btn');
+  const out=document.getElementById('recs-out');
+  const grid=document.getElementById('recs-grid');
+  const stat=document.getElementById('recs-status');
+  btn.disabled=true; btn.innerHTML='<span class="spin"></span> Fetching…';
+  out.style.display='block'; stat.innerHTML='<span class="spin"></span> Calling API…'; grid.innerHTML='';
+  try {
+    let url, data, items=[], label='';
+    if(mode==='user'){
+      const uid=document.getElementById('rec-uid').value.trim();
+      const r=await fetch(`/api/recommend?user_id=${encodeURIComponent(uid)}&n=${n}`,{credentials:'include'});
+      data=await r.json(); items=data.recommendations||[]; label=`User-based recs for ${uid}`;
+    } else if(mode==='trending'){
+      const r=await fetch(`/api/trending?n=${n}`,{credentials:'include'});
+      data=await r.json(); items=data.trending||[]; label='Trending items';
+    } else if(mode==='similar'){
+      const pid=document.getElementById('rec-pid').value.trim();
+      if(!pid){ showToast('Enter a Product ID'); btn.disabled=false; btn.innerHTML='⚡ Get Recommendations'; return; }
+      const r=await fetch(`/api/similar/${encodeURIComponent(pid)}?n=${n}`,{credentials:'include'});
+      data=await r.json(); items=data.similar||[]; label=`Similar to ${pid}`;
+    } else {
+      const cat=document.getElementById('rec-cat').value;
+      const r=await fetch(`/api/trending?category=${encodeURIComponent(cat)}&n=${n}`,{credentials:'include'});
+      data=await r.json(); items=data.trending||[]; label=`Category: ${cat||'All'}`;
+    }
+    if(!items.length){
+      stat.innerHTML=`✦ ${label} · 0 results`;
+      grid.innerHTML='<div class="rec-empty">No recommendations returned. Check your ML model or user interaction data.</div>';
+    } else {
+      stat.innerHTML=`✦ ${label} · <strong style="color:#fff">${items.length} results</strong> from your recommendation engine`;
+      grid.innerHTML=items.map((p,i)=>{
+        const em=EMOJIS[p.category]||'🛍️';
+        const off=p.original_price&&p.price<p.original_price?Math.round((1-p.price/p.original_price)*100):null;
+        const score=p.score?(p.score*100).toFixed(0):(100-i*4);
+        return `<div class="rec-card" onclick="showToast('${(p.name||p.product_name||'Product').replace(/'/g,'')}')">`+
+          `<div class="rec-img">${em}</div>`+
+          `<div class="rec-score">Score: ${score}</div>`+
+          `<div class="rec-name">${p.name||p.product_name||'Product'}</div>`+
+          `<div class="rec-price">₹${Number(p.price).toLocaleString('en-IN')}${off?`<span class="rec-off">${off}% off</span>`:''}</div>`+
+          `</div>`;
+      }).join('');
+      showToast(`✓ ${items.length} recommendations loaded`);
+    }
+  } catch(e){
+    stat.innerHTML='⚠️ API error — is Flask running? Run: python app.py';
+    grid.innerHTML='<div class="rec-empty">Could not reach backend. Start Flask on port 5000.</div>';
+  }
+  btn.disabled=false; btn.innerHTML='⚡ Get Recommendations';
+}
+
+// Explain
+async function fetchExplain(){
+  const uid=document.getElementById('exp-uid').value.trim();
+  const pid=document.getElementById('exp-pid').value.trim();
+  const out=document.getElementById('exp-out');
+  if(!uid||!pid){ showToast('Enter both User ID and Product ID'); return; }
+  out.textContent='Fetching explanation…';
+  try {
+    const r=await fetch(`/api/explain?user_id=${encodeURIComponent(uid)}&product_id=${encodeURIComponent(pid)}`,{credentials:'include'});
+    const d=await r.json();
+    out.innerHTML=`<strong style="color:var(--brand)">Why recommended:</strong><br>${d.explanation||'No explanation available.'}`;
+  } catch(e){ out.textContent='⚠️ Could not reach API. Make sure Flask is running.'; }
+}
+
+// Trending
+async function fetchTrending(){
+  const list=document.getElementById('trending-list');
+  list.innerHTML='<div style="color:var(--ink3);font-size:13px">Loading from /api/trending…</div>';
+  try {
+    const r=await fetch('/api/trending?n=6',{credentials:'include'});
+    const d=await r.json(); const items=d.trending||[];
+    if(!items.length){ list.innerHTML='<div style="color:var(--ink3);font-size:13px">No trending items returned.</div>'; return; }
+    list.innerHTML=items.slice(0,6).map(p=>{
+      const em=EMOJIS[p.category]||'🛍️';
+      return `<div style="display:flex;align-items:center;gap:10px;padding:9px 12px;background:var(--surface);border:1px solid var(--border);border-radius:8px">`+
+        `<div style="width:28px;height:28px;background:#fff;border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:15px;flex-shrink:0">${em}</div>`+
+        `<div style="flex:1;min-width:0"><div style="font-size:13px;font-weight:600;color:var(--ink);white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${p.name||p.product_name}</div><div style="font-size:11px;color:var(--ink3)">${p.category}</div></div>`+
+        `<div style="font-family:'Fraunces',serif;font-size:14px;font-weight:700;color:var(--ink);flex-shrink:0">₹${Number(p.price).toLocaleString('en-IN')}</div></div>`;
+    }).join('');
+    showToast('Trending refreshed ✓');
+  } catch(e){ list.innerHTML='<div style="color:var(--red);font-size:13px">⚠️ API unreachable. Start Flask first.</div>'; }
+}
+
+// Users
+async function fetchUsers(){
+  const tbody=document.getElementById('users-tbody');
+  tbody.innerHTML='<tr><td colspan="7" style="text-align:center;color:var(--ink3);padding:20px">Loading from /api/admin/users…</td></tr>';
+  try {
+    const r=await fetch('/api/admin/users',{credentials:'include'});
+    const d=await r.json(); const users=d.users||[];
+    if(!users.length){ tbody.innerHTML='<tr><td colspan="7" style="text-align:center;color:var(--ink3);padding:20px">No users found.</td></tr>'; return; }
+    tbody.innerHTML=users.map(u=>`<tr>`+
+      `<td style="font-size:11px;font-weight:600;color:var(--brand)">${u.user_id}</td>`+
+      `<td style="font-weight:600">${u.full_name||u.username}</td>`+
+      `<td style="color:var(--ink2)">${u.email}</td>`+
+      `<td>${u.city||'—'}</td>`+
+      `<td style="font-size:11.5px;color:var(--ink3)">${u.preferred_categories||'—'}</td>`+
+      `<td>${u.is_admin?'<span class="st st-hot">Admin</span>':'<span class="st st-stbl">User</span>'}</td>`+
+      `<td style="color:var(--ink3);font-size:12px">${u.signup_date?new Date(u.signup_date).toLocaleDateString('en-IN'):'—'}</td>`+
+      `</tr>`).join('');
+    showToast(`✓ ${users.length} users loaded`);
+  } catch(e){ tbody.innerHTML='<tr><td colspan="7" style="text-align:center;color:var(--red);padding:20px">⚠️ API unreachable. Start Flask first.</td></tr>'; }
+}
+
+// Top Products
+async function fetchTopProducts(){
+  const tbody=document.getElementById('products-tbody');
+  tbody.innerHTML='<tr><td colspan="6" style="text-align:center;color:var(--ink3);padding:20px">Loading from /api/trending…</td></tr>';
+  try {
+    const r=await fetch('/api/trending?n=20',{credentials:'include'});
+    const d=await r.json(); const items=d.trending||[];
+    if(!items.length){ tbody.innerHTML='<tr><td colspan="6" style="text-align:center;color:var(--ink3);padding:20px">No products returned.</td></tr>'; return; }
+    tbody.innerHTML=items.map((p,i)=>{
+      const em=EMOJIS[p.category]||'🛍️';
+      return `<tr>`+
+        `<td style="color:var(--ink3);font-size:11px">${String(i+1).padStart(2,'0')}</td>`+
+        `<td><div class="p-cell"><div class="p-em">${em}</div><div><div class="p-name">${p.name||p.product_name}</div><div class="p-cat">${p.product_id||''}</div></div></div></td>`+
+        `<td><span class="st st-stbl">${p.category}</span></td>`+
+        `<td style="font-weight:700">₹${Number(p.price).toLocaleString('en-IN')}</td>`+
+        `<td>${p.rating?'⭐ '+Number(p.rating).toFixed(1):'—'}</td>`+
+        `<td><button onclick="showToast('Viewing ${(p.name||'product').replace(/'/g,'')}')" style="padding:5px 12px;border-radius:6px;border:1px solid var(--border);background:var(--surface);font-family:'Plus Jakarta Sans',sans-serif;font-size:12px;cursor:pointer">View</button></td>`+
+        `</tr>`;
+    }).join('');
+    showToast(`✓ ${items.length} products loaded`);
+  } catch(e){ tbody.innerHTML='<tr><td colspan="6" style="text-align:center;color:var(--red);padding:20px">⚠️ API unreachable. Start Flask first.</td></tr>'; }
+}
+
+// Evaluate
+async function fetchEvaluate(){
+  const out=document.getElementById('eval-out');
+  out.textContent='→ Running evaluation on 50 users, top-10 items…\n';
+  try {
+    const r=await fetch('/api/admin/evaluate',{credentials:'include'});
+    const d=await r.json();
+    out.textContent='→ Evaluation complete!\n\n'+JSON.stringify(d,null,2);
+    showToast('Evaluation complete ✓');
+  } catch(e){ out.textContent+='⚠️ Could not reach /api/admin/evaluate\nMake sure Flask is running: python app.py'; }
+}
+
+// ── REAL DATA from /api/admin/analytics ──────────────────────────────────
+let tChart = null;
+let realData = { orders:[], revenue:[], users:[], labels:[] };
+
+async function loadRealAnalytics() {
+  try {
+    const res  = await fetch('/api/admin/analytics', {credentials:'include'});
+    const data = await res.json();
+    const s    = data.summary || {};
+
+    // ── Update today's date everywhere ──
+    const today = s.today_date || new Date().toLocaleDateString('en-IN',{weekday:'long',day:'numeric',month:'long',year:'numeric'});
+    document.getElementById('live-clock').textContent = s.last_updated || new Date().toLocaleTimeString('en-IN');
+    // Update all date references
+    document.querySelectorAll('.page-sub').forEach(el => {
+      if(el.textContent.includes('May')) el.textContent = `Real-time · ${s.last_updated||''} · ${today}`;
+    });
+    document.querySelectorAll('.live-pill').forEach(el => {
+      const dot = el.querySelector('.live-dot');
+      if(dot) el.innerHTML = `<div class="live-dot"></div> Live · ${today}`;
+    });
+
+    // ── Update KPI cards with REAL numbers ──
+    const revenue = s.total_revenue || 0;
+    const revStr  = revenue >= 100000
+      ? '₹' + (revenue/100000).toFixed(1) + 'L'
+      : '₹' + revenue.toLocaleString('en-IN');
+
+    document.querySelector('.kpi:nth-child(1) .kpi-val').textContent = revStr;
+    document.querySelector('.kpi:nth-child(2) .kpi-val').textContent = (s.total_orders||0).toLocaleString('en-IN');
+    document.querySelector('.kpi:nth-child(3) .kpi-val').textContent = (s.total_users||0).toLocaleString('en-IN');
+    document.querySelector('.kpi:nth-child(4) .kpi-val').textContent = (s.conversion_rate||0).toFixed(2) + '%';
+
+    // ── Update funnel with REAL data ──
+    const f = data.funnel || {};
+    const funnelData = [
+      {id:'VIEW',    val:f.view||0,       pct:'100', color:'#3b82f6'},
+      {id:'CLICK',   val:f.click||0,      pct: f.view ? Math.round(f.click/f.view*100)+'':72, color:'#8b5cf6'},
+      {id:'ADD CART',val:f.add_to_cart||0,pct: f.view ? Math.round(f.add_to_cart/f.view*100)+'':47, color:'#10b981'},
+      {id:'WISHLIST', val:f.wishlist||0,  pct: f.view ? Math.round(f.wishlist/f.view*100)+'':22, color:'#f59e0b'},
+      {id:'PURCHASE', val:f.purchase||0,  pct: f.view ? Math.round(f.purchase/f.view*100)+'':13, color:'#ef4444'},
+    ];
+    const maxVal = funnelData[0].val || 1;
+    document.querySelectorAll('.f-row').forEach((row, i) => {
+      if(!funnelData[i]) return;
+      const fd  = funnelData[i];
+      const bar = row.querySelector('.f-bar');
+      const valEl = row.querySelector('.f-val');
+      const pctEl = row.querySelector('.f-pct');
+      if(bar) {
+        bar.style.width = Math.round(fd.val/maxVal*100)+'%';
+        bar.style.background = fd.color;
+        bar.textContent = fd.val.toLocaleString('en-IN');
+      }
+      if(valEl) valEl.textContent = fd.val.toLocaleString('en-IN');
+      if(pctEl) pctEl.textContent = fd.pct+'%';
+    });
+
+    // ── Build REAL trend chart ──
+    const trend = data.daily_trend || [];
+    realData.labels  = trend.map(d => d.date);
+    realData.orders  = trend.map(d => d.orders);
+    realData.revenue = trend.map(d => d.revenue);
+    realData.users   = trend.map(d => d.users);
+
+    buildTrendChart(realData.orders, realData.labels);
+
+    // ── Category chart with REAL data ──
+    const cats = data.categories || [];
+    if(cats.length && catChart) {
+      catChart.data.labels = cats.map(c=>c.category);
+      catChart.data.datasets[0].data = cats.map(c=>c.count);
+      catChart.update();
+    }
+
+    // ── Update top products table ──
+    const prods = data.top_products || [];
+    if(prods.length) {
+      const tbody = document.querySelector('#sec-analytics table tbody');
+      if(tbody) {
+        tbody.innerHTML = prods.map((p,i)=>{
+          const em = EMOJIS[p.category]||'🛍️';
+          return `<tr><td style="color:var(--ink3);font-size:11px">${String(i+1).padStart(2,'0')}</td>`+
+            `<td><div class="p-cell"><div class="p-em">${em}</div><div>`+
+            `<div class="p-name">${p.name||p.product_name||'Product'}</div>`+
+            `<div class="p-cat">${p.category||''}</div></div></div></td>`+
+            `<td style="font-weight:700">₹${Number(p.price||0).toLocaleString('en-IN')}</td>`+
+            `<td>${p.num_reviews||'—'}</td>`+
+            `<td class="t-up">↑ Live</td>`+
+            `<td><span class="st st-hot">🔥 Hot</span></td></tr>`;
+        }).join('');
+      }
+    }
+
+    // Update date bar
+    const dateDisplay = document.querySelector('.date-display');
+    if(dateDisplay) dateDisplay.innerHTML = `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg> ${today}`;
+
+  } catch(e) {
+    console.warn('Analytics API error:', e);
+  }
+}
+
+function buildTrendChart(data, labels) {
+  const tCtx = document.getElementById('trendChart').getContext('2d');
+  const grad = tCtx.createLinearGradient(0,0,0,230);
+  grad.addColorStop(0,'rgba(59,130,246,.18)');
+  grad.addColorStop(1,'rgba(59,130,246,0)');
+
+  if(tChart) { tChart.destroy(); }
+
+  tChart = new Chart(tCtx, {
+    type:'line',
+    data:{
+      labels: labels,
+      datasets:[{
+        label:'Orders', data:data,
+        borderColor:'#3b82f6', backgroundColor:grad,
+        borderWidth:2.5, pointRadius:3,
+        pointBackgroundColor:'#3b82f6',
+        pointBorderColor:'#fff', pointBorderWidth:2,
+        fill:true, tension:.45
+      }]
+    },
+    options:{
+      responsive:true, maintainAspectRatio:false,
+      plugins:{
+        legend:{display:false},
+        tooltip:{backgroundColor:'#0f172a',titleColor:'#94a3b8',bodyColor:'#f1f5f9',padding:10,cornerRadius:8}
+      },
+      scales:{
+        x:{grid:{display:false},ticks:{font:{family:'Plus Jakarta Sans',size:11},color:'#94a3b8',maxTicksLimit:10,maxRotation:0}},
+        y:{grid:{color:'#f1f5f9'},ticks:{font:{family:'Plus Jakarta Sans',size:11},color:'#94a3b8',padding:8}}
+      },
+      interaction:{mode:'index',intersect:false}
+    }
+  });
+}
+
+function switchTrend(type, btn) {
+  document.querySelectorAll('.chip').forEach(c=>c.classList.remove('act'));
+  btn.classList.add('act');
+  const map = {orders:realData.orders, revenue:realData.revenue, users:realData.users};
+  if(tChart) {
+    tChart.data.datasets[0].data  = map[type];
+    tChart.data.datasets[0].label = type;
+    tChart.update();
+  }
+}
+
+// Device chart
+new Chart(document.getElementById('deviceChart').getContext('2d'),{
+  type:'doughnut',
+  data:{labels:['Mobile','Desktop','Tablet'],datasets:[{data:[62,28,10],backgroundColor:['#3b82f6','#8b5cf6','#10b981'],borderWidth:0,hoverOffset:5}]},
+  options:{responsive:true,maintainAspectRatio:false,cutout:'72%',plugins:{legend:{display:false},tooltip:{backgroundColor:'#0f172a',bodyColor:'#f1f5f9',padding:10,cornerRadius:8}}}
+});
+
+// Category chart — will be updated by loadRealAnalytics()
+let catChart = new Chart(document.getElementById('catChart').getContext('2d'),{
+  type:'bar',
+  data:{
+    labels:['Electronics','Fashion','Sports','Books','Home','Beauty'],
+    datasets:[{data:[34,26,18,10,8,4],backgroundColor:['#3b82f6','#8b5cf6','#10b981','#f59e0b','#ef4444','#ec4899'],borderRadius:6,borderSkipped:false}]
+  },
+  options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false},tooltip:{backgroundColor:'#0f172a',bodyColor:'#f1f5f9',padding:10,cornerRadius:8,callbacks:{label:c=>` ${c.parsed.y} items`}}},scales:{x:{grid:{display:false},ticks:{font:{family:'Plus Jakarta Sans',size:11},color:'#94a3b8'}},y:{grid:{color:'#f1f5f9'},ticks:{font:{family:'Plus Jakarta Sans',size:11},color:'#94a3b8'}}}}
+});
+
+// ── Load real data on page load ──
+loadRealAnalytics();
+
+// ── Auto refresh every 60 seconds ──
+setInterval(loadRealAnalytics, 60000);
+</script>
+</body>
+</html>

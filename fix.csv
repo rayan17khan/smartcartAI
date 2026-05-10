@@ -1,0 +1,23 @@
+import csv
+
+# Read raw lines
+with open('data/products.csv', 'r', encoding='utf-8') as f:
+    content = f.read()
+
+# Re-parse properly handling all quoting
+import pandas as pd
+import io
+
+df = pd.read_csv(
+    io.StringIO(content),
+    on_bad_lines='skip',
+    engine='python',
+    quotechar='"'
+)
+
+print(f"Rows loaded: {len(df)}")
+print(f"Columns: {len(df.columns)} → {df.columns.tolist()}")
+
+# Save cleanly with proper quoting
+df.to_csv('data/products.csv', index=False, quoting=csv.QUOTE_ALL)
+print("Done!")

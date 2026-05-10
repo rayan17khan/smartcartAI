@@ -1,0 +1,115 @@
+/* SmartCart AI – Component Styles */
+
+/* ── Progress bar ── */
+.progress-bar-wrap { background: #e2e8f0; border-radius: 99px; height: 8px; overflow: hidden; }
+.progress-bar      { height: 100%; background: linear-gradient(90deg, var(--primary), var(--accent)); border-radius: 99px; transition: width .6s ease; }
+
+/* ── Toggle ── */
+.toggle-wrap { display:flex; align-items:center; gap:10px; cursor:pointer; }
+.toggle { width:40px; height:22px; border-radius:99px; background:#cbd5e1; position:relative; transition:var(--transition); }
+.toggle.on { background:var(--primary); }
+.toggle::after { content:''; position:absolute; top:2px; left:2px; width:18px; height:18px; border-radius:50%; background:#fff; transition:var(--transition); box-shadow:var(--shadow-sm); }
+.toggle.on::after { left:20px; }
+
+/* ── Tag chips ── */
+.tag-list { display:flex; flex-wrap:wrap; gap:6px; }
+.tag { background:var(--primary-light); color:var(--primary); font-size:11px; font-weight:600; padding:3px 10px; border-radius:99px; }
+
+/* ── Info row ── */
+.info-row { display:flex; align-items:center; gap:8px; font-size:13px; padding:6px 0; }
+.info-row i { color:var(--primary); width:18px; text-align:center; }
+
+/* ── Score bar ── */
+.score-row { display:flex; align-items:center; gap:10px; font-size:13px; margin-bottom:6px; }
+.score-label { width:80px; color:var(--text-muted); font-size:12px; }
+.score-fill  { flex:1; height:6px; background:#e2e8f0; border-radius:99px; overflow:hidden; }
+.score-fill-inner { height:100%; background:linear-gradient(90deg,var(--primary),var(--accent)); border-radius:99px; }
+.score-val   { font-size:12px; font-weight:600; color:var(--text); width:30px; text-align:right; }
+
+/* ── Tabs ── */
+.tabs-wrap { border-bottom:2px solid var(--border); display:flex; gap:0; margin-bottom:20px; }
+.tab-btn {
+  padding:10px 20px; font-size:14px; font-weight:600; color:var(--text-muted);
+  border:none; background:none; cursor:pointer; border-bottom:2px solid transparent;
+  margin-bottom:-2px; transition:var(--transition);
+}
+.tab-btn.active, .tab-btn:hover { color:var(--primary); border-bottom-color:var(--primary); }
+
+/* ── Flash sale banner ── */
+.flash-sale {
+  background:linear-gradient(135deg,#efe810,#90f50b9c);
+  border-radius:var(--radius); padding:12px 20px;
+  display:flex; align-items:center; justify-content:space-between;
+  color:#fff; margin-bottom:12px;
+}
+.flash-title { font-size:18px; font-weight:800; display:flex; align-items:center; gap:8px; }
+.flash-timer { display:flex; align-items:center; gap:8px; }
+.timer-block { background:rgba(0,0,0,.25); padding:6px 12px; border-radius:var(--radius-sm); font-size:20px; font-weight:800; min-width:48px; text-align:center; }
+.timer-sep   { font-size:20px; font-weight:800; }
+
+/* ── Delivery badge ── */
+.delivery-badge {
+  display:inline-flex; align-items:center; gap:6px;
+  background:#dcfce7; color:#16a34a; padding:5px 12px;
+  border-radius:99px; font-size:12px; font-weight:600;
+}
+
+/* ── Brand logo strip ── */
+.brand-strip { display:flex; gap:16px; overflow-x:auto; padding-bottom:8px; }
+.brand-chip  {
+  flex-shrink:0; padding:10px 20px; background:#fff; border:1.5px solid var(--border);
+  border-radius:var(--radius-sm); font-size:13px; font-weight:700; color:var(--text-muted);
+  cursor:pointer; transition:var(--transition); white-space:nowrap;
+}
+.brand-chip:hover { border-color:var(--primary); color:var(--primary); }
+
+/* ── Offer card ── */
+.offer-cards { display:grid; grid-template-columns:repeat(3,1fr); gap:16px; margin-bottom:20px; }
+.offer-card  {
+  border-radius:var(--radius); padding:20px;
+  display:flex; align-items:center; gap:16px; cursor:pointer;
+  transition:var(--transition); border:1.5px solid transparent;
+}
+.offer-card:hover { transform:translateY(-2px); box-shadow:var(--shadow); }
+.offer-card.blue   { background:linear-gradient(135deg,#eff6ff,#dbeafe); }
+.offer-card.purple { background:linear-gradient(135deg,#faf5ff,#ede9fe); }
+.offer-card.gold   { background:linear-gradient(135deg,#fffbeb,#fef3c7); }
+.offer-icon  { font-size:28px; flex-shrink:0; }
+.offer-title { font-size:14px; font-weight:700; }
+.offer-sub   { font-size:12px; color:var(--text-muted); margin-top:2px; }
+
+/* ── Search highlight ── */
+.highlight { background:#fef3c7; border-radius:2px; padding:0 2px; }
+
+/* ── Loading spinner ── */
+.spinner-wrap { display:flex; align-items:center; justify-content:center; padding:60px; }
+.spinner {
+  width:40px; height:40px; border-radius:50%;
+  border:4px solid var(--border); border-top-color:var(--primary);
+  animation:spin .8s linear infinite;
+}
+@keyframes spin { to { transform:rotate(360deg); } }
+
+/* ── Notification dot ── */
+.notif-dot {
+  width:8px; height:8px; border-radius:50%; background:#44dbef;
+  display:inline-block; margin-left:4px;
+}
+
+/* ── Admin metric row ── */
+.metric-row { display:flex; align-items:center; gap:12px; padding:10px 0; border-bottom:1px solid var(--border); }
+.metric-rank { font-size:13px; font-weight:700; color:var(--text-muted); width:28px; }
+.metric-name { flex:1; font-size:13px; font-weight:600; }
+.metric-val  { font-size:13px; font-weight:700; color:var(--primary); }
+.metric-bar  { width:100px; height:6px; background:#e2e8f0; border-radius:99px; overflow:hidden; }
+.metric-bar-inner { height:100%; background:linear-gradient(90deg,var(--primary),var(--accent)); border-radius:99px; }
+
+/* ── Evaluation metrics ── */
+.eval-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:16px; }
+.eval-card {
+  background:#fff; border-radius:var(--radius); padding:20px; text-align:center;
+  box-shadow:var(--shadow-sm); border:1px solid var(--border);
+}
+.eval-label { font-size:12px; color:var(--text-muted); font-weight:600; text-transform:uppercase; letter-spacing:.5px; }
+.eval-value { font-size:36px; font-weight:800; margin:8px 0; background:linear-gradient(135deg,var(--primary),var(--accent)); -webkit-background-clip:text; -webkit-text-fill-color:transparent; }
+.eval-desc  { font-size:12px; color:var(--text-muted); }

@@ -1,0 +1,6 @@
+import pandas as pd
+
+df = pd.read_csv('data/products.csv', on_bad_lines='skip', engine='python')
+print(f"Loaded {len(df)} rows successfully")
+df.to_csv('data/products.csv', index=False, quoting=1)
+print("CSV repaired and saved!")
